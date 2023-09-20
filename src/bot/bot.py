@@ -209,8 +209,8 @@ async def send_message():
 
 
 async def scheduler(job=send_message,
-                    time_to: str = '22',
-                    time_from: str = '12',
+                    time_to: int = 21,
+                    time_from: int = 11,
                     interval: int = 30):
     """
     Планировщик выполнения события

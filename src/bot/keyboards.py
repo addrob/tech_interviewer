@@ -52,6 +52,7 @@ class TopicCallbackFactory(CallbackData, prefix='topic'):
                 text=topic.name,
                 callback_data=cls(topic_id=topic.id)
             )
+            builder.adjust(5)
         return builder.as_markup()
 
 
@@ -67,4 +68,5 @@ class SubTopicCallbackFactory(CallbackData, prefix='subtopic'):
                 text=subtopic.name,
                 callback_data=cls(subtopic_id=subtopic.id)
             )
+            builder.adjust(5)
         return builder.as_markup()

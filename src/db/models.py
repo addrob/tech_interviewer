@@ -51,8 +51,9 @@ class Question(Base):
     @classmethod
     def get_random_by_subtopic(cls,
                                subtopic: 'SubTopic'):
-        questions = session.execute(select(cls.id).where(cls.subtopic == subtopic.id)).all()
-        question_id = random.choice(range(1, len(questions) + 1))
+        questions = session.execute(select(cls).where(cls.subtopic == subtopic.id)).all()
+        question_id = random.choice(questions)[0].id
+        print('question_id ', question_id)
         return session.execute(select(cls).where(cls.id == question_id)).one()[0]
 
     @classmethod
@@ -86,7 +87,7 @@ class SubTopic(Base):
     def get_random_by_topic(cls,
                             topic: 'Topic'):
         subtopics = session.execute(select(cls).where(cls.topic == topic.id)).fetchall()
-        subtopic_id = random.choice(range(1, len(subtopics) + 1))
+        subtopic_id = random.choice(subtopics)[0].id
         return session.execute(select(cls).where(cls.id == subtopic_id)).one()[0]
 
     @classmethod
@@ -116,7 +117,7 @@ class Topic(Base):
     @classmethod
     def get_random(cls):
         topics = session.execute(select(cls)).all()
-        topic_id = random.choice(range(1, len(topics) + 1))
+        topic_id = random.choice(topics)[0].id
         return session.execute(select(cls).where(cls.id == topic_id)).one()[0]
 
     @classmethod

@@ -1,5 +1,3 @@
-import asyncio
-
 import pytz
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiogram import Bot, Dispatcher, types
@@ -11,6 +9,7 @@ from src.bot.keyboards import QuestionCallbackFactory, StartCommandKeyboard, Ans
     SubTopicCallbackFactory
 from src.bot.config import TG_API_KEY, MY_CHAT_ID
 from src.db.models import Topic, SubTopic, Question, Answer
+
 
 bot = Bot(token=TG_API_KEY)
 dp = Dispatcher()
@@ -179,10 +178,16 @@ async def add_answer(message: types.Message,
     await state.clear()
 
 
-@dp.callback_query(TopicCallbackFactory.filter(), AddContent.add_topic)
+@dp.callback_query(TopicCallbackFactory.filter())
 async def add_topic_callback_handler(callback: types.CallbackQuery,
                                      callback_data: TopicCallbackFactory,
                                      state: FSMContext):
+    """
+    Обработчик коллбэков при нажатии кнопки Добавить тему
+    :param callback: коллбэк
+    :param callback_data: данные коллбэка
+    :param state: состояние
+    """
     subtopics = SubTopic.get_by_topic_id(topic_id=callback_data.topic_id)
     await callback.message.answer(text='Передайте или выберите подтему',
                                   reply_markup=SubTopicCallbackFactory.get_keyboard(subtopics=subtopics))
@@ -195,6 +200,12 @@ async def add_topic_callback_handler(callback: types.CallbackQuery,
 async def add_subtopic_callback_handler(callback: types.CallbackQuery,
                                         callback_data: SubTopicCallbackFactory,
                                         state: FSMContext):
+    """
+    Обработчик колллбэков при нажатии кнопки Добавить подтему
+    :param callback: коллбэк
+    :param callback_data: данные коллбэка
+    :param state: состояние
+    """
     await callback.message.answer(text='Передайте вопрос')
     await state.set_state(AddContent.add_question)
     await state.update_data(subtopic_id=callback_data.subtopic_id)
@@ -214,7 +225,7 @@ async def send_message():
 async def scheduler(job=send_message,
                     time_to: int = 21,
                     time_from: int = 11,
-                    interval: int = 30):
+                    interval: str = '0, 30'):
     """
     Планировщик выполнения события
     :param job: событие
@@ -239,7 +250,3 @@ async def main():
     dp.startup.register(scheduler)
     await dp.start_polling(bot)
 
-
-if __name__ == "__main__":
-    print('running')
-    asyncio.run(main())

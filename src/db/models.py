@@ -76,7 +76,7 @@ class SubTopic(Base):
         existing_subtopics = session.execute(select(cls)).fetchall()
         for existing_subtopic in existing_subtopics:
             existing_subtopic = existing_subtopic[0]
-            if name == existing_subtopic.name:
+            if name == existing_subtopic.name and topic_id == existing_subtopic.topic:
                 return existing_subtopic
         subtopic = cls(name=name, topic=topic_id)
         session.add(subtopic)

@@ -6,7 +6,8 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.filters.command import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from src.bot.keyboards import QuestionCallbackFactory, StartCommandKeyboard, AnswerCallbackFactory, TopicCallbackFactory, \
+from src.bot.keyboards import QuestionCallbackFactory, StartCommandKeyboard, AnswerCallbackFactory, \
+    TopicCallbackFactory, \
     SubTopicCallbackFactory
 from src.bot.config import TG_API_KEY, MY_CHAT_ID
 from src.db.models import Topic, SubTopic, Question, Answer
@@ -164,7 +165,7 @@ async def add_question(message: types.Message,
 
 @dp.message(AddContent.add_answer)
 async def add_answer(message: types.Message,
-                       state: FSMContext):
+                     state: FSMContext):
     """
     Обработчик состояния ожидания json с вопросом
     Добавляет в базу данных переданный вопрос
@@ -178,20 +179,22 @@ async def add_answer(message: types.Message,
     await state.clear()
 
 
-@dp.callback_query(TopicCallbackFactory.filter())
+@dp.callback_query(TopicCallbackFactory.filter(), AddContent.add_topic)
 async def add_topic_callback_handler(callback: types.CallbackQuery,
-                               callback_data: TopicCallbackFactory,
-                               state: FSMContext):
+                                     callback_data: TopicCallbackFactory,
+                                     state: FSMContext):
     subtopics = SubTopic.get_by_topic_id(topic_id=callback_data.topic_id)
     await callback.message.answer(text='Передайте или выберите подтему',
                                   reply_markup=SubTopicCallbackFactory.get_keyboard(subtopics=subtopics))
     await callback.answer()
+    await state.set_state(AddContent.add_subtopic)
+    await state.update_data(topic_id=callback_data.topic_id)
 
 
 @dp.callback_query(SubTopicCallbackFactory.filter())
 async def add_subtopic_callback_handler(callback: types.CallbackQuery,
-                                  callback_data: SubTopicCallbackFactory,
-                                  state: FSMContext):
+                                        callback_data: SubTopicCallbackFactory,
+                                        state: FSMContext):
     await callback.message.answer(text='Передайте вопрос')
     await state.set_state(AddContent.add_question)
     await state.update_data(subtopic_id=callback_data.subtopic_id)

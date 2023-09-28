@@ -87,6 +87,12 @@ class Question(Base):
         """
         return session.execute(select(cls).where(cls.id == question_id)).fetchone()[0]
 
+    def get_text_formatted(self):
+        subtopic = SubTopic.get_by_id(self.subtopic)
+        topic = Topic.get_by_id(subtopic.topic)
+        text = f'{topic.name} -- {subtopic.name}: \n{self.text}'
+        return text
+
 
 class SubTopic(Base):
     """
@@ -129,10 +135,14 @@ class SubTopic(Base):
         return session.execute(select(cls).where(cls.id == subtopic_id)).fetchone()[0]
 
     @classmethod
+    def get_by_id(cls, subtopic_id: int):
+        return session.execute(select(cls).where(cls.id == subtopic_id)).fetchone()[0]
+
+    @classmethod
     def get_by_topic_id(cls, topic_id: int):
         """
-        Получение подтемы по id
-        :param topic_id: id подтемы
+        Получение подтем по id темы
+        :param topic_id: id темы
         """
         return session.execute(select(cls).where(cls.topic == topic_id)).fetchall()
 
@@ -178,5 +188,9 @@ class Topic(Base):
         Получение всех тем
         """
         return session.execute(select(cls)).fetchall()
+
+    @classmethod
+    def get_by_id(cls, topic_id: int):
+        return session.execute(select(cls).where(cls.id == topic_id)).fetchone()[0]
 
 

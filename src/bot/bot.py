@@ -62,7 +62,8 @@ async def get_question(message: types.Message,
     :param state: состояние
     """
     question = get_random_question()
-    await message.answer(text=question.text, reply_markup=QuestionCallbackFactory.get_keyboard())
+    message_text = question.get_text_formatted()
+    await message.answer(text=message_text, reply_markup=QuestionCallbackFactory.get_keyboard())
     await state.set_state(GetAnswer.waiting_for_answer)
     await state.update_data(answer=question.answer[0].text)
 
@@ -217,8 +218,9 @@ async def send_message():
     Отправка сообщения со случаный вопросом
     """
     question = get_random_question()
+    message_text = question.get_text_formatted()
     await bot.send_message(chat_id=MY_CHAT_ID,
-                           text=question.text,
+                           text=message_text,
                            reply_markup=AnswerCallbackFactory.get_keyboard(question))
 
 

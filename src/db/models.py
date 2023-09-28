@@ -90,7 +90,7 @@ class Question(Base):
     def get_text_formatted(self):
         subtopic = SubTopic.get_by_id(self.subtopic)
         topic = Topic.get_by_id(subtopic.topic)
-        text = f'{topic.name} -- {subtopic.name}: \n{self.text}'
+        text = f'{topic.name} -- {subtopic.name}: \n\n{self.text}'
         return text
 
 

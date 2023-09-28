@@ -221,7 +221,8 @@ async def send_message():
     message_text = question.get_text_formatted()
     await bot.send_message(chat_id=MY_CHAT_ID,
                            text=message_text,
-                           reply_markup=AnswerCallbackFactory.get_keyboard(question))
+                           reply_markup=AnswerCallbackFactory.get_keyboard(question),
+                           parse_mode='HTML')
 
 
 async def scheduler(job=send_message,
